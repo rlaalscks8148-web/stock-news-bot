@@ -1,0 +1,26 @@
+# 이 파일은 저장소의 .github/workflows/daily-stock-news.yml 경로에 넣으세요.
+# 매일 한국시간 오전 8시(UTC 23:00 전날)에 자동으로 실행돼요.
+
+name: 매일 종목 뉴스 텔레그램 발송
+
+on:
+  schedule:
+    - cron: "0 23 * * *"   # UTC 23:00 = 한국시간 08:00
+  workflow_dispatch: {}     # "Run workflow" 버튼으로 즉시 테스트 가능
+
+jobs:
+  send-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - run: python stock_news_bot.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
